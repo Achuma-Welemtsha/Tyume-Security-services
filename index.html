@@ -903,15 +903,60 @@ function toggleService(card) {
   if (!isOpen) card.classList.add('open');
 }
 
-// ── FORM SUBMIT ──
-function handleSubmit(e) {
-  e.preventDefault();
-  const btn = e.target;
-  btn.textContent = '✅ Request Sent! We\'ll call you shortly.';
-  btn.style.background = '#1a2f5e';
-  btn.style.color = '#8dc63f';
-  btn.disabled = true;
-}
+
+        // ── FORM HANDLER — sends to email via mailto: ──
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            const feedback = document.getElementById('formFeedback');
+
+            // Gather data
+            const name = document.getElementById('formName').value.trim();
+            const company = document.getElementById('formCompany').value.trim();
+            const phone = document.getElementById('formPhone').value.trim();
+            const service = document.getElementById('formService').value;
+            const message = document.getElementById('formMessage').value.trim();
+
+            // Validate
+            if (!name || !phone) {
+                feedback.className = 'form-feedback error';
+                feedback.textContent = '⚠️ Please fill in your name and phone number.';
+                return;
+            }
+
+            // Build email content
+            const subject = 'New Risk Assessment Request - Tyume Security';
+            const body =
+                `New risk assessment request from your website:\n\n` +
+                `Name: ${name}\n` +
+                `Company: ${company || 'Not provided'}\n` +
+                `Phone: ${phone}\n` +
+                `Service needed: ${service || 'Not specified'}\n` +
+                `Message: ${message || 'No additional details.'}\n\n` +
+                `— Please follow up with this lead.`;
+
+            // Encode and open mailto
+            const mailtoLink =
+                `mailto:tyumeservices@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            // Show success feedback before opening mail client
+            feedback.className = 'form-feedback success';
+            feedback.textContent = '✅ Opening your email client… Please hit send to complete your request.';
+
+            // Disable button briefly to avoid double-click
+            btn.disabled = true;
+            btn.textContent = 'Opening email…';
+
+            // Open mail client
+            window.location.href = mailtoLink;
+
+            // Re-enable after a moment (user can click again if needed)
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = 'Request Free Assessment →';
+            }, 5000);
+        }
 </script>
 </body>
 </html>
